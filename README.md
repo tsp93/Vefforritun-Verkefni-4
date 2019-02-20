@@ -140,7 +140,8 @@ Til að byrja er hægt að afrita þetta repo og bæta við á sínu eigin:
 
 * 10% – Snyrtilegur kóði, engar villur þegar `npm test` er keyrt
 * 20% – Verkefni sett upp á Heroku
-
+* 30% - Vefþjónustuskil
+* 40% – Virkni verkefnalista
 
 ## Sett fyrir
 
