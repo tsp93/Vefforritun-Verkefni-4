@@ -39,7 +39,8 @@ Virkni skal leyfa að:
 * `GET` á `\:id` skal skila hlut sem inniheldur verkefni með viðeigandi id
   * Ef verkefni er til er því skilað sem hlut
   * Ef verkefni er ekki til skal skila að verkefni sé ekki til
-* `PUT` á `\:id` skal uppfæra verkefni með viðeigandi `id`
+* `PATCH` á `\:id` skal uppfæra verkefni með viðeigandi `id`
+  * Ekki þarf að senda öll gögn—aðeins þau sem á að uppfæra
   * Sömu reglur gilda um gögn og þegar nýtt verkefni er búið til
   * Ef færsla er ekki til skal skila að verkefni sé ekki til
 * `DELETE` á `\:id`, eyðir verkefni með viðeigandi `id`
