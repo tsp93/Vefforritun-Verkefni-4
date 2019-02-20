@@ -98,7 +98,7 @@ Geyma skal gögn í postgres gagnagrunni með eftirtalda dálka:
 Þegar `npm run setup` er keyrt skal setja upp gagnagrunn (g.r.f. að `DATABASE_URL` sé sett) með eftirtöldum prufugögnum:
 
 Titill | Staðsetning | Lokið | Ljúka fyrir
-------------|----------|------|---------|-------
+-------|-------------|-------|---------
 Skrá í vefforritun 2 | 1 | true | null
 Sækja verkefni 4 á github | 2 | false | null
 Klára verkefni 4 | 3 | false | null
