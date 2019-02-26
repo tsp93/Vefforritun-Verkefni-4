@@ -133,7 +133,7 @@ Til að byrja er hægt að afrita þetta repo og bæta við á sínu eigin:
 > cd vef2-2019-v4
 > git remote remove origin # fjarlægja remote sem verkefni er í
 > git remote add origin <slóð á repo> # bæta við í þínu repo
-> git push
+> git push -u origin master # ýta á nýtt origin og tracka branch
 ```
 
 ## Mat
