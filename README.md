@@ -15,6 +15,7 @@ Virkni skal leyfa að:
   * Mögulegt skal vera að senda inn að aðeins eigi að sýna verkefni sem er lokið (`completed = true`)
 * Sækja stakt verkefni eftir `id` með `id, title, position, due, created, updated, completed`
 * Útbúa verkefni með titli, loka dagsetningu og staðsetningu
+  * Verkefni sem er búið til nýtt er alltaf með `completed = false` sem setja má með sjálfgefnu gildi í gagnagrunn
   * Sjá að neðan um staðfestingu gagna
 * Uppfæra verkefni eftir `id` með titli, loka dagsetningu, staðsetningu og hvort verkefni sé lokið eða ekki
 * Eyða verkefni eftir `id`
@@ -33,6 +34,9 @@ Virkni skal leyfa að:
 ## Vefþjónusta
 
 * `GET` á `\` skal skila fylki af öllum verkefnum
+  * Ef query-string breyta `order=desc` er send með skal raða verkefnum eftir `position` í lækkandi röð, annars í hækkandi r-ð (ascending). T.d. `/?order=desc`
+  * Ef query-string breyta `completed=true` er send skal aðeins birta verkefni sem er lokið, ef `completed=false` skal aðeins birta verkefni sem er ekki lokið. T.d. `/?completed=true`
+  * Mögulegt á að vera að blanda saman þessum gildum, t.d. `/?completed=true&order=desc`
 * `POST` á `\` skal útbúa nýtt verkefni
   * Ef það er ólöglegt skal öllum villum skilað í fylki með skilaboðum að ofan og hvaða reitur var ólöglegur
   * Ef löglegt er verkefni skilað
@@ -166,8 +170,9 @@ Verkefnahluti gildir 60% og lokapróf gildir 40%. Ná verður *bæði* verkefnah
 
 ---
 
-> Útgáfa 0.1
+> Útgáfa 0.2
 
 | Útgáfa | Lýsing                                    |
 |--------|-------------------------------------------|
 | 0.1    | Fyrsta útgáfa                             |
+| 0.2    | Bæta við um query-string fyrir GET /, lagfæra lýsingu á því sem senda þarf inn |
