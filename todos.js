@@ -1,50 +1,108 @@
 const xss = require('xss');
 const { query } = require('./db');
+const { validate } = require('./validate');
 
-async function list() {
-  const result = await query('SELECT * FROM ITEMS');
+/**
+ * Sækir verkefni eftir staðsetningu.
+ *
+ * @param {string} order Hækkandi eða lækkandi röð
+ * @param {boolean} completed Satt biður aðeins um lokin verkefni
+ * @returns {array} Fylki með verkefnum
+ */
+async function getProjects({ order = 'asc', completed = false }) {
+  let ascOrDesc = 'ASC';
+  if (order === 'desc') {
+    ascOrDesc = 'DESC';
+  }
+  const completeQuery = completed ? 'WHERE completed = true ' : '';
+
+  const result = await query(`SELECT * FROM projects ${completeQuery}ORDER BY position ${ascOrDesc}`);
 
   return result.rows;
 }
 
-function isEmpty(s) {
-  return s == null && !s;
-}
+/**
+ * Sækir stakt verkefni.
+ *
+ * @param {number} id Id á verkefni
+ * @returns {object} Hlutur með verkefni
+ */
+async function getProject(id) {
+  const result = await query(`SELECT * FROM projects WHERE id = ${id}`);
 
-function validate(title, text) {
-  const errors = [];
-
-  if (!isEmpty(title)) {
-    if (typeof title !== 'string' || title.length === 0) {
-      errors.push({
-        field: 'title',
-        error: 'Title must be a non-empty string',
-      });
-    }
-  }
-
-  if (!isEmpty(text)) {
-    if (typeof text !== 'string' || text.length === 0) {
-      errors.push({
-        field: 'text',
-        error: 'Text must be a non-empty string',
-      });
-    }
-  }
-
-  return errors;
+  return result.rows[0];
 }
 
 /**
- * Updates an item, either its title, text or both.
+ * Býr til nýtt verkefni.
  *
- * @param {number} id Id of item to update
- * @param {object} item Item to update
- * @returns {object}
+ * @param {number} id Id á verkefni
+ * @returns {object} Hlutur með verkefni
  */
-async function update(id, item) {
-  const result = await query('SELECT * FROM items where id = $1', [id]);
+async function createProject(title, due, position) {
+  const validation = validate({ title, due, position }, false);
+  if (validation.length > 0) {
+    return {
+      success: false,
+      validation,
+    };
+  }
 
+  const fields = [
+    title ? 'title' : null,
+    due ? 'due' : null,
+    position ? 'position' : null,
+  ]
+    .filter(Boolean);
+
+  const values = [
+    title ? xss(title) : null,
+    due,
+    position ? Number(position) : null,
+  ]
+    .filter(Boolean);
+
+  let fieldString = 'title';
+  let valueString = '$1';
+  for (let i = 1; i < values.length; i += 1) {
+    fieldString = `${fieldString}, $${fields[i]}`;
+    valueString = `${valueString}, $${i}`;
+  }
+
+  const SQLquery = `
+  INSERT INTO projects (${fieldString})
+  VALUES (${valueString})
+  RETURNING *`;
+
+  const result = await query(SQLquery, values);
+
+  return {
+    success: true,
+    validation: [],
+    item: result.rows[0],
+  };
+}
+
+/**
+ * Uppfærir verkefni.
+ *
+ * @param {number} id Id á verkefni
+ * @param {string} title Titill á verkefni
+ * @param {string} due Loka dagsetning verkefnis
+ * @param {number} position Staðsetning á verkefni
+ * @param {boolean} completed Hvort verkefni sé lokið eða ekki
+ * @returns {object} Hlutur með uppfært verkefni
+ */
+async function updateProject(id, { title, due, position, completed }) {
+  const validation = validate({ title, due, position, completed }, true);
+  if (validation.length > 0) {
+    return {
+      success: false,
+      validation,
+    };
+  }
+
+  const result = await query(`SELECT * FROM projects WHERE id = ${id}`);
   if (result.rows.length === 0) {
     return {
       success: false,
@@ -53,51 +111,59 @@ async function update(id, item) {
     };
   }
 
-  const validationResult = validate(item.title, item.text);
+  const fields = [
+    title ? 'title' : null,
+    due ? 'due' : null,
+    position ? 'position' : null,
+    completed ? 'completed' : null,
+    'updated',
+  ]
+    .filter(Boolean);
 
-  if (validationResult.length > 0) {
-    return {
-      success: false,
-      notFound: false,
-      validation: validationResult,
-    };
-  }
+  const values = [
+    title ? xss(title) : null,
+    due,
+    position ? Number(position) : null,
+    completed,
+    'now()',
+  ]
+    .filter(Boolean);
 
-  const changedColumns = [
-    !isEmpty(item.title) ? 'title' : null,
-    !isEmpty(item.text) ? 'text' : null,
-  ].filter(Boolean);
+  const updates = [id, ...values];
 
-  const changedValues = [
-    !isEmpty(item.title) ? xss(item.title) : null,
-    !isEmpty(item.text) ? xss(item.text) : null,
-  ].filter(Boolean);
+  const updatedQuery = fields.map((field, i) => `${field} = $${i + 2}`);
 
-  const updates = [id, ...changedValues];
-
-  const updatedColumnsQuery =
-    changedColumns
-      .map((column, i) => `${column} = $${i + 2}`);
-
-  console.log(updates);
-  console.log(updatedColumnsQuery);
-
-  const q = `
-    UPDATE items
-    SET ${updatedColumnsQuery.join(', ')}
+  const SQLquery = `
+    UPDATE projects
+    SET ${updatedQuery.join(', ')}
     WHERE id = $1
-    RETURNING id, title, text`;
-  console.log(q);
+    RETURNING *`;
 
-  const updateResult = await query(q, updates);
-  console.log(updateResult);
+  const updateResult = await query(SQLquery, updates);
   return {
     success: true,
+    notFound: false,
+    validation: [],
     item: updateResult.rows[0],
   };
 }
 
+/**
+ * Eyðir verkefni.
+ *
+ * @param {number} id Id á verkefni
+ * @returns {object} Hlutur með eydda verkefni
+ */
+async function deleteProject(id) {
+  const result = await query(`DELETE FROM projects WHERE id = ${id} RETURNING *`);
+
+  return result.rows[0];
+}
+
 module.exports = {
-  list,
-  update,
+  getProjects,
+  getProject,
+  createProject,
+  updateProject,
+  deleteProject,
 };
