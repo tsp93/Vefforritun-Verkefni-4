@@ -6,15 +6,18 @@ const { validate } = require('./validate');
  * Sækir verkefni eftir staðsetningu.
  *
  * @param {string} order Hækkandi eða lækkandi röð
- * @param {boolean} completed Satt biður aðeins um lokin verkefni
+ * @param {boolean} completed Satt/ósatt biður aðeins um lokin/ólokin verkefni
  * @returns {array} Fylki með verkefnum
  */
-async function getProjects({ order = 'asc', completed = false }) {
+async function getProjects({ order = 'asc', completed = null }) {
   let ascOrDesc = 'ASC';
   if (order === 'desc') {
     ascOrDesc = 'DESC';
   }
-  const completeQuery = completed ? 'WHERE completed = true ' : '';
+  let completeQuery = '';
+  if (completed != null) {
+    completeQuery = completed ? 'WHERE completed = true ' : 'WHERE completed = false ';
+  }
 
   const result = await query(`SELECT * FROM projects ${completeQuery}ORDER BY position ${ascOrDesc}`);
 
