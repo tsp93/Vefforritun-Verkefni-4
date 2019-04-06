@@ -15,8 +15,9 @@ async function getProjects({ order = 'asc', completed = null }) {
     ascOrDesc = 'DESC';
   }
   let completeQuery = '';
-  if (completed != null) {
-    completeQuery = completed ? 'WHERE completed = true ' : 'WHERE completed = false ';
+  if (completed === 'false' || completed === 'true') {
+    const completedAsBoolean = completed !== 'false';
+    completeQuery = completedAsBoolean ? 'WHERE completed = true ' : 'WHERE completed = false ';
   }
 
   const result = await query(`SELECT * FROM projects ${completeQuery}ORDER BY position ${ascOrDesc}`);
