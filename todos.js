@@ -69,8 +69,8 @@ async function createProject(title, due, position) {
   let fieldString = 'title';
   let valueString = '$1';
   for (let i = 1; i < values.length; i += 1) {
-    fieldString = `${fieldString}, $${fields[i]}`;
-    valueString = `${valueString}, $${i}`;
+    fieldString = `${fieldString}, ${fields[i]}`;
+    valueString = `${valueString}, $${i + 1}`;
   }
 
   const SQLquery = `
