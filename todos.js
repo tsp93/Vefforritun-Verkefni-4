@@ -91,10 +91,7 @@ async function createProject(title, due, position) {
  * Uppfærir verkefni.
  *
  * @param {number} id Id á verkefni
- * @param {string} title Titill á verkefni
- * @param {string} due Loka dagsetning verkefnis
- * @param {number} position Staðsetning á verkefni
- * @param {boolean} completed Hvort verkefni sé lokið eða ekki
+ * @param {Todo} todo Verkefnishlutur
  * @returns {object} Hlutur með uppfært verkefni
  */
 async function updateProject(id, { title, due, position, completed }) {

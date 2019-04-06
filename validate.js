@@ -27,7 +27,7 @@ function validate({ title, due, position, completed } = {}, patching) {
   }
 
   if (!isEmpty(title) || !patching) {
-    if (typeof title !== 'string' || title.length < 0 || title.length > 128) {
+    if (typeof title !== 'string' || title.length < 1 || title.length > 128) {
       errors.push({
         field: 'title',
         message: 'Titill verður að vera strengur sem er 1 til 128 stafir',
