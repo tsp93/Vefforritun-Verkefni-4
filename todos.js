@@ -118,7 +118,7 @@ async function updateProject(id, { title, due, position, completed }) {
     title ? 'title' : null,
     due ? 'due' : null,
     position ? 'position' : null,
-    completed ? 'completed' : null,
+    completed == null ? null : 'completed',
     'updated',
   ]
     .filter(Boolean);
