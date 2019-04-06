@@ -8,6 +8,8 @@ const app = express();
 
 app.use(express.urlencoded({ extended: true }));
 
+app.use(express.json());
+
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE');
@@ -39,7 +41,7 @@ app.use(notFoundHandler);
 app.use(errorHandler);
 
 const {
-  PORT: port = 3000,
+  PORT: port = 5000,
   HOST: host = '127.0.0.1',
 } = process.env;
 

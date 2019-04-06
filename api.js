@@ -127,5 +127,6 @@ router.post('/', catchErrors(createProjectRoute));
 router.get('/:id', catchErrors(getProjectRoute));
 router.patch('/:id', catchErrors(updateProjectRoute));
 router.delete('/:id', catchErrors(deleteProjectRoute));
+router.get('/favicon.ico', (req, res) => res.status(204));
 
 module.exports = router;
