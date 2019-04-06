@@ -118,7 +118,6 @@ async function updateProject(id, { title, due, position, completed }) {
     title ? 'title' : null,
     due ? 'due' : null,
     position ? 'position' : null,
-    completed == null ? null : 'completed',
     'updated',
   ]
     .filter(Boolean);
@@ -127,10 +126,14 @@ async function updateProject(id, { title, due, position, completed }) {
     title ? xss(title) : null,
     due,
     position ? Number(position) : null,
-    completed,
     'now()',
   ]
     .filter(Boolean);
+
+  if (completed != null) {
+    fields.push('completed');
+    values.push(completed);
+  }
 
   const updates = [id, ...values];
 
